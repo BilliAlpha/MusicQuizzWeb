@@ -3,8 +3,9 @@ var express = require('express'),
     fs      = require('fs'),
     app     = express(),
     eps     = require('ejs'),
-    morgan  = require('morgan');
-    
+    morgan  = require('morgan'),
+    ws = require("nodejs-websocket");
+
 Object.assign=require('object-assign')
 
 app.engine('html', require('ejs').renderFile);
@@ -90,6 +91,18 @@ app.get('/pagecount', function (req, res) {
     res.send('{ pageCount: -1 }');
   }
 });
+ 
+// Socket Server
+var sockServer = ws.createServer(function (socket) {
+    console.log("New connection")
+    socket.on("text", function (str) {
+        console.log("Received "+str)
+        socket.sendText(str.toUpperCase()+"!!!")
+    })
+    socket.on("close", function (code, reason) {
+        console.log("Connection closed")
+    })
+}).listen(8001)
 
 // error handling
 app.use(function(err, req, res, next){
